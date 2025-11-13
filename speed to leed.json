@@ -1,0 +1,269 @@
+{
+  "name": "form to reach",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "google-form",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -96,
+        -144
+      ],
+      "id": "34d2d14e-de70-41b5-acae-ea4ca93bbdfa",
+      "name": "Webhook1",
+      "webhookId": "0eb50d1c-371e-480c-a978-e243665d3a1a"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "80f5998d-9ad4-4025-8391-eb0dbb32b66f",
+              "name": "name",
+              "value": "={{ $json.body.answers['как_вас_зовут'] }}",
+              "type": "string"
+            },
+            {
+              "id": "d8efd212-7d15-46e8-93ae-33c77bcde6b8",
+              "name": "number",
+              "value": "={{$json.body.answers['напишите_ваш_номер_телефона'] ? String($json.body.answers['напишите_ваш_номер_телефона']).replace(/[^0-9+]/g,'') : ''}}\n",
+              "type": "string"
+            },
+            {
+              "id": "e8177299-40b5-486c-80ff-cf2b65ba2f94",
+              "name": "formId",
+              "value": "={{ $json.body.formId }}",
+              "type": "string"
+            },
+            {
+              "id": "328a36db-1fdd-4a7b-bebb-f43fdccd5346",
+              "name": "createdAt",
+              "value": "={{ $json.body.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "8fd446ac-8dcf-48cc-b048-83a038700997",
+              "name": "number for twilio",
+              "value": "={{ $json.body.answers['напишите_ваш_номер_телефона'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        -352
+      ],
+      "id": "f142c459-007c-45cf-be49-94fbd190460f",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1T5_SNMZtClw4w0tfVI1qkNJPRca8FCXYypMjeIzwe1Q",
+          "mode": "list",
+          "cachedResultName": "n8n crm",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1T5_SNMZtClw4w0tfVI1qkNJPRca8FCXYypMjeIzwe1Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Лист1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1T5_SNMZtClw4w0tfVI1qkNJPRca8FCXYypMjeIzwe1Q/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name": "={{ $json.name }}",
+            "number": "={{ $json.number }}",
+            "formId": "={{ $json.formId }}",
+            "createdAt": "={{ $json.createdAt }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name",
+              "displayName": "name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "number",
+              "displayName": "number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "formId",
+              "displayName": "formId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "createdAt",
+              "displayName": "createdAt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        -144
+      ],
+      "id": "1a3baaab-b4a0-45e2-93f2-8169ac38a8db",
+      "name": "Append row in sheet1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "CZRnUw3GGfy9xJCJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vapi.ai/call",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "=json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={\n  \"type\": \"outboundPhoneCall\",\n  \"assistantId\": \"3b7276cc-b7f6-474b-85ee-e1731436ad06\",\n  \"phoneNumberId\": \"2b9ce71b-8607-435c-9ad7-f0767de7c5ea\",\n  \"customer\": {\n    \"number\": \"={{ $node['Webhook1'].json.body.answers['напишите_ваш_номер_телефона'] }}\",\n    \"name\": \"={{ $node['Webhook1'].json.body.answers['как_вас_зовут'] }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        672,
+        80
+      ],
+      "id": "d7e42d4c-f71f-47ce-b1f3-d864ceb62909",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "XfCMkftXzKH7Lx9r",
+          "name": "Authorization"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+19789714342",
+        "to": "={{ $('Webhook1').item.json.body.answers[\"напишите_ваш_номер_телефона\"] }}",
+        "message": "=salowmaleykim {{ $('Webhook1').item.json.body.answers[\"как_вас_зовут\"] }} aga",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -368
+      ],
+      "id": "53eedf6e-b663-421b-87df-6bed7d4e5323",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "xx9d2o76Uh7kjpu2",
+          "name": "Twilio account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "fe1c18d5-9308-4a15-bac6-c9601e79753a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "84268e5a93d92195546d44b73f5d75a3a96e459ba6f49b0b466837a46103c087"
+  },
+  "id": "xxVn6tZ6rsF9Kzsd",
+  "tags": []
+}
